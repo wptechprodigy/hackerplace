@@ -1,0 +1,8 @@
+{
+  "name": "hackerplace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:wptechprodigy/hackerplace.git",
+  "author": "wptechprodigy <waheed.freelancer16@gmail.com>",
+  "license": "MIT"
+}
