@@ -1,17 +1,17 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = require('../../config');
+const { SECRET_KEY } = require('../../config');
 
 const User = require('../../models/User');
 
 module.exports = {
   Mutation: {
-    async register(_, { UserRegistrationDetails: { username, email, password, confirmPassword } }) {
+    async register(_, { userRegistrationDetails: { username, email, password, confirmPassword } }) {
       // TODO: validate user details
       // TODO: confirm both password fields have same value
       // TODO: hash the password and create a user token
       // TODO: save user into the database
-      const passwordHash = bcrypt.hash(password, 12);
+      const passwordHash = await bcrypt.hash(password, 12);
 
       const newUser = new User({
         username,
@@ -20,7 +20,7 @@ module.exports = {
         createdAt: new Date().toISOString()
       });
 
-      const result = await newUser;
+      const result = await newUser.save();
 
       const token = jwt.sign({
         id: result.id,
