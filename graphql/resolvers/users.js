@@ -2,13 +2,19 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UserInputError } = require('apollo-server');
 const { SECRET_KEY } = require('../../config');
+const { validateRegisterInput } = require('../../utils/validators');
 
 const User = require('../../models/User');
 
 module.exports = {
   Mutation: {
     async register(_, { userRegistrationDetails: { username, email, password, confirmPassword } }) {
-      // TODO: validate user details
+      // Validate user details - Never trust users
+      const { errors, valid } = validateRegisterInput(username, email, password, confirmPassword);
+      if (!valid) {
+        throw new UserInputError('Errors', { errors } )
+      }
+
       // Verify username is not already taken
       const user = await User.findOne({ username });
 
@@ -19,11 +25,14 @@ module.exports = {
           }
         });
       }
-      // TODO: confirm both password fields have same value
-      if (password !== confirmPassword) {
-        throw new UserInputError('Passwords do not match', {
+
+      // Is the email unique?
+      const userEmail = await User.findOne({ email });
+
+      if (userEmail) {
+        throw new UserInputError('Email is already taken', {
           errors: {
-            password: 'The password fields do not match.',
+            username: 'This email is already taken.',
           }
         });
       }
