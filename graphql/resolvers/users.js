@@ -34,7 +34,7 @@ module.exports = {
         errors.general = 'Wrong credentials';
         throw new UserInputError('Wrong credentials', { errors });
       }
-      console.log(password, user);
+      
       // Does the password match?
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
