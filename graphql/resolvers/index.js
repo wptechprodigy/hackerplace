@@ -3,7 +3,7 @@ const usersResolvers = require('./users');
 
 module.exports = {
   Query: {
-    ...postsResolvers,
-    ...usersResolvers,
+    ...postsResolvers.Query,
+    ...usersResolvers.Query,
   }
 }
