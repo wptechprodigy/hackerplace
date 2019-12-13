@@ -2,17 +2,60 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UserInputError } = require('apollo-server');
 const { SECRET_KEY } = require('../../config');
-const { validateRegisterInput } = require('../../utils/validators');
+const { validateRegisterInput, validateLogin } = require('../../utils/validators');
 
 const User = require('../../models/User');
 
+/**
+ * A function to generate a token
+ *
+ * @param  Object user payload
+ * @returns Token object
+ */
+function generateToken(user) {
+  return jwt.sign({
+    id: user.id,
+    username: user.username,
+    email: user.email
+  }, SECRET_KEY, { expiresIn: '1h' });
+}
+
 module.exports = {
   Mutation: {
+    async login(_, { username, password }) {
+      const { errors, valid } = validateLogin(username, password);
+      if (!valid) {
+        throw new UserInputError('Errors', { errors });
+      }
+
+      // Do we have such user?
+      const user = await User.findOne({ username });
+      if (!user) {
+        errors.general = 'Wrong credentials';
+        throw new UserInputError('Wrong credentials', { errors });
+      }
+      console.log(password, user);
+      // Does the password match?
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        errors.general = 'Wrong credentials';
+        throw new UserInputError('Wrong credentials', { errors });
+      }
+
+      // User is valid...then generate token for him/her
+      const token = generateToken(user);
+
+      return {
+        ...user._doc,
+        id: user._id,
+        token,
+      }
+    },
     async register(_, { userRegistrationDetails: { username, email, password, confirmPassword } }) {
       // Validate user details - Never trust users
       const { errors, valid } = validateRegisterInput(username, email, password, confirmPassword);
       if (!valid) {
-        throw new UserInputError('Errors', { errors } )
+        throw new UserInputError('Errors', { errors });
       }
 
       // Verify username is not already taken
@@ -48,17 +91,13 @@ module.exports = {
       });
 
       // save user into the database
-      const result = await newUser.save();
+      const savedUser = await newUser.save();
 
-      const token = jwt.sign({
-        id: result.id,
-        username: result.username,
-        email: result.email
-      }, SECRET_KEY, { expiresIn: '1h' });
+      const token = generateToken(savedUser);
 
       return {
-        ...result._doc,
-        id: result._id,
+        ...savedUser._doc,
+        id: savedUser._id,
         token,
       }
     }
