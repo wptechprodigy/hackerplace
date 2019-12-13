@@ -17,9 +17,17 @@ module.exports = {
           errors: {
             username: 'This username is already taken.',
           }
-        })
+        });
       }
       // TODO: confirm both password fields have same value
+      if (password !== confirmPassword) {
+        throw new UserInputError('Passwords do not match', {
+          errors: {
+            password: 'The password fields do not match.',
+          }
+        });
+      }
+
       // hash the password and create a user token
       const passwordHash = await bcrypt.hash(password, 12);
 
