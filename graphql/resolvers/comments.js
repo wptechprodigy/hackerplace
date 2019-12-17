@@ -21,15 +21,15 @@ module.exports = {
         throw new UserInputError('Post not found!');
       }
 
-      post.comments.unShift({
+      post.comments.unshift({
         body,
         username,
         createdAt: new Date().toISOString(),
       });
 
-      await post.save();
+      const updatedPost = await post.save();
 
-      return post;
+      return updatedPost;
     }
   }
 }
