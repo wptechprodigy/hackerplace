@@ -15,6 +15,10 @@ module.exports = (context) => {
     try {
       // authHeader = [Bearer token]
       const user = jwt.verify(token, SECRET_KEY);
+      if (!user) {
+        throw new AuthenticationError('You must be logged in.');
+      }
+
       return user;
     } catch (error) {
       throw new AuthenticationError('Authentication token must be \'Bearer [token].');
