@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server');
+const { AuthenticationError,UserInputError } = require('apollo-server');
 const Post = require('../../models/Post');
 const checkAuth = require('../../utils/check_auth');
 
@@ -27,9 +27,24 @@ module.exports = {
         createdAt: new Date().toISOString(),
       });
 
-      const updatedPost = await post.save();
+      await post.save();
 
-      return updatedPost;
+      return post;
+    },
+    async deleteComment(_, { postId, commentId }, context) {
+      const { username } = checkAuth(context);
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        throw new UserInputError('Post not found!');
+      }
+
+      const commentIndex = await post.comments.findIndex(comment => comment.id === commentId);
+      if (post.comments[commentIndex].username === username) {
+        post.comments.splice(commentIndex, 1);
+        await post.save();
+        return post;
+      } else throw new AuthenticationError('You cannot perform this action.');
     }
   }
 }
