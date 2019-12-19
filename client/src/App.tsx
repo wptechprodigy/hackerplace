@@ -3,7 +3,9 @@ import './App.css';
 
 const App: React.FC = () => {
   return (
-    <div><h1>Hackerplace</h1></div>
+    <div>
+      <h1>Hackerplace</h1>
+    </div>
   );
 }
 

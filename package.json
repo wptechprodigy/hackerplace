@@ -15,5 +15,8 @@
   },
   "scripts": {
     "start": "node index"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
   }
 }
