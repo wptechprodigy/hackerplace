@@ -1,11 +1,11 @@
 import React, { useState, MouseEvent } from 'react';
-import { Menu, MenuItemProps } from 'semantic-ui-react';
+import { Menu, MenuItemProps, Container } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 function NavMenu() {
   const pathname = window.location.pathname;
   const path = pathname === '/' ? 'home' : pathname.substr(1);
-
+  
   const [activeItem, setActiveItem] = useState(path);
 
   const handleItemClick = (
@@ -18,30 +18,33 @@ function NavMenu() {
   };
 
   return (
-    <Menu pointing secondary>
-      <Menu.Item
-        name="home"
-        active={activeItem === 'home'}
-        onClick={handleItemClick}
-        as={Link}
-        to={'/'}
-      />
-      <Menu.Menu position="right">
+    <Menu pointing secondary size='massive' color='teal'>
+      <Container>
         <Menu.Item
-          name="login"
-          active={activeItem === 'login'}
+          name="home"
+          active={activeItem === 'home'}
           onClick={handleItemClick}
           as={Link}
-          to={'/login'}
+          to={'/'}
         />
-        <Menu.Item
-          name="register"
-          active={activeItem === 'register'}
-          onClick={handleItemClick}
-          as={Link}
-          to={'/register'}
-        />
-      </Menu.Menu>
+        <Menu.Menu position="right">
+          <Menu.Item
+            name="login"
+            active={activeItem === 'login'}
+            onClick={handleItemClick}
+            as={Link}
+            to={'/login'}
+          />
+          <Menu.Item
+            name="register"
+            active={activeItem === 'register'}
+            onClick={handleItemClick}
+            as={Link}
+            to={'/register'}
+          />
+        </Menu.Menu>
+
+      </Container>
     </Menu>
   );
 }
